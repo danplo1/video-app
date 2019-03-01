@@ -1,6 +1,7 @@
-package pl.danplo.videoapp;
+package pl.danplo.videoapp.api;
 
 import org.springframework.web.bind.annotation.*;
+import pl.danplo.videoapp.dao.entity.VideoCassette;
 
 
 import java.time.LocalDate;

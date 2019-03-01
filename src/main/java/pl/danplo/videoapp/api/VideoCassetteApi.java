@@ -1,7 +1,9 @@
 package pl.danplo.videoapp.api;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.danplo.videoapp.dao.entity.VideoCassette;
+import pl.danplo.videoapp.manager.VideoCassetteManager;
 
 
 import java.time.LocalDate;
@@ -13,44 +15,41 @@ import java.util.Optional;
 @RequestMapping("/api/cassetts")
 public class VideoCassetteApi {
 
-    private List<VideoCassette> videoCassettes;
 
-    public VideoCassetteApi() {
-        videoCassettes = new ArrayList<>();
-        videoCassettes.add(new VideoCassette(1L, "Chłopaki nie płaczą", LocalDate.of(2000, 6, 20)));
-        videoCassettes.add(new VideoCassette(2L, "Bohemian Rhapsody", LocalDate.of(2018, 9, 10)));
-        videoCassettes.add(new VideoCassette(3L, "Spectre", LocalDate.of(2015, 10, 23)));
-        videoCassettes.add(new VideoCassette(4L, "Alternatywy 4", LocalDate.of(1984, 7, 5)));
+    private VideoCassetteManager videoCassettes;
 
+    @Autowired
+    public VideoCassetteApi(VideoCassetteManager videoCassettes) {
+        this.videoCassettes = videoCassettes;
     }
 
     @GetMapping("/all")//metoda odpowiada za pobieranie elementów z api
-    public List<VideoCassette> getAll() {
-        return videoCassettes;
+    public Iterable<VideoCassette> getAll() {
+        return videoCassettes.findAll();
     }
 
     @GetMapping
-    public VideoCassette getById(@RequestParam int index) {
-        Optional<VideoCassette> first = videoCassettes.stream().
-                filter(element -> element.getId() == index).findFirst();
-        return first.get();
-        // jeżeli element ma takie samo ID jak to z indexu, to go pobieram
+    public Optional<VideoCassette> getById(@RequestParam Long index) {
+        return videoCassettes.findById(index);
+
     }
 
     @PostMapping
-    public boolean addVideo(@RequestBody VideoCassette videoCassette) {
-        //metoda webowa
-        return videoCassettes.add(videoCassette);
+    public VideoCassette addVideo(@RequestBody VideoCassette videoCassette) {
+        return videoCassettes.save(videoCassette);
+
     }
 
     @PutMapping //nadpisywanie elementów
-    public boolean updateVideo(@RequestBody VideoCassette videoCassette) {
-        return videoCassettes.add(videoCassette);
+    public VideoCassette updateVideo(@RequestBody VideoCassette videoCassette) {
+        return videoCassettes.save(videoCassette);
     }
 
-    @DeleteMapping //usuwanie elementów
-    public boolean deleteVideo(@RequestParam int index) {
-        return videoCassettes.removeIf(element -> element.getId()== index);
+
+    @DeleteMapping //usuwanie
+    public void deleteVideo(@RequestParam Long index) {
+        videoCassettes.deleteById(index);
     }
+
 
 }
